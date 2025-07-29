@@ -109,6 +109,7 @@ class BirthdayCircle {
         document.getElementById('zoomIn').addEventListener('click', () => this.zoom(1.2));
         document.getElementById('zoomOut').addEventListener('click', () => this.zoom(0.8));
         document.getElementById('resetView').addEventListener('click', () => this.resetView());
+        document.getElementById('exportPdf').addEventListener('click', () => this.exportToPdf());
         
         // Mouse events
         this.canvas.addEventListener('mousedown', (e) => this.handleMouseDown(e));
@@ -313,7 +314,10 @@ class BirthdayCircle {
         
         let content = `<strong>${monthNames[date.getMonth()]} ${date.getDate()}</strong>`;
         content += `<br><div style="margin-top: 8px; color: #4ecdc4; font-weight: 500;">🎂 Birthday${people.length > 1 ? 's' : ''}:</div>`;
-        content += people.map(person => `<div style="margin-left: 8px; color: #e2e8f0;">${person.name}</div>`).join('');
+        content += people.map(person => {
+            const birthYear = person.date.getFullYear();
+            return `<div style="margin-left: 8px; color: #e2e8f0;">${person.name} <span style="color: #a0aec0;">(${birthYear})</span></div>`;
+        }).join('');
         
         this.tooltip.innerHTML = content;
         
@@ -346,7 +350,11 @@ class BirthdayCircle {
         this.ctx.scale(this.scale, this.scale);
         
         // Draw year circle outline
-        this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+        if (this.printMode) {
+            this.ctx.strokeStyle = 'rgba(0, 0, 0, 0.4)';
+        } else {
+            this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+        }
         this.ctx.lineWidth = 2;
         this.ctx.beginPath();
         this.ctx.arc(0, 0, this.radius, 0, 2 * Math.PI);
@@ -374,8 +382,15 @@ class BirthdayCircle {
         // Set smaller font size for month labels
         const fontSize = Math.max(8, Math.min(10, 24 / this.scale));
         this.ctx.font = `${fontSize}px Arial`;
-        this.ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
-        this.ctx.strokeStyle = 'rgba(0, 0, 0, 0.6)';
+        
+        // Use print-friendly colors when in print mode
+        if (this.printMode) {
+            this.ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+            this.ctx.strokeStyle = 'rgba(100, 100, 100, 0.8)';
+        } else {
+            this.ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+            this.ctx.strokeStyle = 'rgba(0, 0, 0, 0.6)';
+        }
         this.ctx.lineWidth = 1;
         
         for (let month = 0; month < 12; month++) {
@@ -385,7 +400,11 @@ class BirthdayCircle {
             const midAngle = (startAngle + endAngle) / 2;
             
             // Draw month divider line at start
-            this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.6)';
+            if (this.printMode) {
+                this.ctx.strokeStyle = 'rgba(0, 0, 0, 0.6)';
+            } else {
+                this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.6)';
+            }
             this.ctx.lineWidth = 2;
             this.ctx.beginPath();
             this.ctx.moveTo(Math.cos(startAngle) * (this.radius - 15), Math.sin(startAngle) * (this.radius - 15));
@@ -404,8 +423,15 @@ class BirthdayCircle {
         const shortText = text.substring(0, 3); // JAN, FEB, etc.
         
         this.ctx.save();
-        this.ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
-        this.ctx.strokeStyle = 'rgba(0, 0, 0, 0.6)';
+        
+        // Use print-friendly colors when in print mode
+        if (this.printMode) {
+            this.ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+            this.ctx.strokeStyle = 'rgba(100, 100, 100, 0.8)';
+        } else {
+            this.ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+            this.ctx.strokeStyle = 'rgba(0, 0, 0, 0.6)';
+        }
         this.ctx.lineWidth = 1;
         this.ctx.textAlign = 'center';
         this.ctx.textBaseline = 'middle';
@@ -436,7 +462,11 @@ class BirthdayCircle {
             
             if (hasBirthday) {
                 // Birthday marker - larger and colored
-                this.ctx.fillStyle = isHovered ? '#ff6b6b' : '#4ecdc4';
+                if (this.printMode) {
+                    this.ctx.fillStyle = isHovered ? '#d53f8c' : '#2d3748'; // Dark colors for print
+                } else {
+                    this.ctx.fillStyle = isHovered ? '#ff6b6b' : '#4ecdc4';
+                }
                 this.ctx.beginPath();
                 this.ctx.arc(x, y, isHovered ? 10 : 7, 0, 2 * Math.PI);
                 this.ctx.fill();
@@ -460,7 +490,11 @@ class BirthdayCircle {
                 }
             } else {
                 // Regular day marker
-                this.ctx.fillStyle = isHovered ? 'rgba(255, 255, 255, 0.8)' : 'rgba(255, 255, 255, 0.4)';
+                if (this.printMode) {
+                    this.ctx.fillStyle = isHovered ? 'rgba(0, 0, 0, 0.6)' : 'rgba(0, 0, 0, 0.3)';
+                } else {
+                    this.ctx.fillStyle = isHovered ? 'rgba(255, 255, 255, 0.8)' : 'rgba(255, 255, 255, 0.4)';
+                }
                 this.ctx.beginPath();
                 this.ctx.arc(x, y, isHovered ? 4 : 2, 0, 2 * Math.PI);
                 this.ctx.fill();
@@ -474,8 +508,15 @@ class BirthdayCircle {
         // Much smaller font size and only show when significantly zoomed in
         const fontSize = Math.max(6, Math.min(8, 16 / this.scale));
         this.ctx.font = `${fontSize}px Arial`;
-        this.ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
-        this.ctx.strokeStyle = 'rgba(0, 0, 0, 0.7)';
+        
+        // Use print-friendly colors when in print mode
+        if (this.printMode) {
+            this.ctx.fillStyle = 'rgba(0, 0, 0, 0.9)';
+            this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
+        } else {
+            this.ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+            this.ctx.strokeStyle = 'rgba(0, 0, 0, 0.7)';
+        }
         this.ctx.lineWidth = 1;
         this.ctx.textAlign = 'start';
         this.ctx.textBaseline = 'middle';
@@ -510,10 +551,146 @@ class BirthdayCircle {
     
     drawCenter() {
         // Draw subtle center dot
-        this.ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+        if (this.printMode) {
+            this.ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
+        } else {
+            this.ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+        }
         this.ctx.beginPath();
         this.ctx.arc(0, 0, 2, 0, 2 * Math.PI);
         this.ctx.fill();
+    }
+    
+    async exportToPdf() {
+        try {
+            // Show loading state
+            const exportBtn = document.getElementById('exportPdf');
+            const originalText = exportBtn.textContent;
+            exportBtn.textContent = 'Exporting...';
+            exportBtn.disabled = true;
+            
+            // Create high-resolution canvas for export
+            const printCanvas = document.createElement('canvas');
+            const printCtx = printCanvas.getContext('2d');
+            
+            // Set high resolution for crisp printing (300 DPI equivalent)
+            const scaleFactor = 4; // 4x higher resolution
+            const exportSize = 3000; // Large canvas size for detailed rendering
+            
+            printCanvas.width = exportSize;
+            printCanvas.height = exportSize;
+            
+            // Scale context for high-DPI rendering
+            printCtx.scale(scaleFactor, scaleFactor);
+            
+            // Create a temporary birthday circle instance for export
+            const exportCircle = {
+                ctx: printCtx,
+                centerX: exportSize / (2 * scaleFactor),
+                centerY: exportSize / (2 * scaleFactor),
+                radius: 300, // Large radius for detailed view
+                scale: 8, // High zoom to show birthday names
+                birthdays: this.birthdays,
+                daysInYear: this.daysInYear,
+                
+                // Copy the drawing methods
+                drawMonthMarkers: this.drawMonthMarkers.bind(this),
+                drawDayMarkers: this.drawDayMarkers.bind(this),
+                drawCenter: this.drawCenter.bind(this),
+                drawCurvedText: this.drawCurvedText.bind(this),
+                drawBirthdayText: this.drawBirthdayText.bind(this)
+            };
+            
+            // Set white background for print
+            printCtx.fillStyle = 'white';
+            printCtx.fillRect(0, 0, exportSize / scaleFactor, exportSize / scaleFactor);
+            
+            // Apply transforms for centered, scaled rendering
+            printCtx.save();
+            printCtx.translate(exportCircle.centerX, exportCircle.centerY);
+            printCtx.scale(exportCircle.scale, exportCircle.scale);
+            
+            // Temporarily store original properties
+            const originalCtx = this.ctx;
+            const originalScale = this.scale;
+            const originalRadius = this.radius;
+            
+            // Switch to print context
+            this.ctx = printCtx;
+            this.scale = exportCircle.scale;
+            this.radius = exportCircle.radius;
+            
+            // Set print-friendly colors (override the original colors)
+            this.printMode = true;
+            
+            // Draw all components with print context
+            this.drawMonthMarkers();
+            this.drawDayMarkers();
+            this.drawCenter();
+            
+            // Reset print mode
+            this.printMode = false;
+            
+            printCtx.restore();
+            
+            // Restore original properties
+            this.ctx = originalCtx;
+            this.scale = originalScale;
+            this.radius = originalRadius;
+            
+            // Convert canvas to image data
+            const imageData = printCanvas.toDataURL('image/jpeg', 0.95);
+            
+            // Create PDF with large format (A2 size for detailed printing)
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF({
+                orientation: 'portrait',
+                unit: 'mm',
+                format: 'a2' // Large format: 420 × 594 mm
+            });
+            
+            // Calculate dimensions to fit the page while maintaining aspect ratio
+            const pageWidth = 420; // A2 width in mm
+            const pageHeight = 594; // A2 height in mm
+            const margin = 20;
+            const availableWidth = pageWidth - (2 * margin);
+            const availableHeight = pageHeight - (2 * margin);
+            
+            // Use square aspect ratio centered on page
+            const imageSize = Math.min(availableWidth, availableHeight);
+            const x = (pageWidth - imageSize) / 2;
+            const y = (pageHeight - imageSize) / 2;
+            
+            // Add image to PDF
+            pdf.addImage(imageData, 'JPEG', x, y, imageSize, imageSize);
+            
+            // Add title
+            pdf.setFontSize(24);
+            pdf.text('Birthday Circle', pageWidth / 2, 30, { align: 'center' });
+            
+            // Add generation date
+            pdf.setFontSize(12);
+            const currentDate = new Date().toLocaleDateString();
+            pdf.text(`Generated on ${currentDate}`, pageWidth / 2, pageHeight - 15, { align: 'center' });
+            
+            // Save the PDF
+            pdf.save('birthday-circle.pdf');
+            
+            // Restore button state
+            exportBtn.textContent = originalText;
+            exportBtn.disabled = false;
+            
+            console.log('PDF export completed successfully!');
+            
+        } catch (error) {
+            console.error('Error exporting PDF:', error);
+            alert('Error exporting PDF. Please try again.');
+            
+            // Restore button state
+            const exportBtn = document.getElementById('exportPdf');
+            exportBtn.textContent = 'Export PDF';
+            exportBtn.disabled = false;
+        }
     }
 }
 

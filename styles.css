@@ -51,6 +51,15 @@ h1 {
     min-width: 50px;
 }
 
+#exportPdf {
+    background: #38a169;
+    min-width: 100px;
+}
+
+#exportPdf:hover {
+    background: #2f855a;
+}
+
 .controls button:hover {
     background: #3182ce;
     transform: translateY(-2px);
