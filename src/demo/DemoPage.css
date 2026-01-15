@@ -1,0 +1,79 @@
+.demo-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.demo-header {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  padding: 1rem 2rem;
+  text-align: center;
+  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+}
+
+.demo-header h1 {
+  color: #4a5568;
+  font-size: 2rem;
+  font-weight: 300;
+  margin: 0;
+}
+
+.demo-subtitle {
+  color: #718096;
+  font-size: 0.9rem;
+  margin: 0.5rem 0 0 0;
+}
+
+.demo-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+  min-height: 0;
+}
+
+.demo-footer {
+  background: rgba(255, 255, 255, 0.9);
+  padding: 0.75rem;
+  text-align: center;
+  font-size: 0.85rem;
+  color: #718096;
+}
+
+.demo-footer p {
+  margin: 0;
+}
+
+.demo-loading,
+.demo-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  color: white;
+  text-align: center;
+  padding: 2rem;
+}
+
+.demo-error h2 {
+  margin-bottom: 1rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .demo-header {
+    padding: 1rem;
+  }
+
+  .demo-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .demo-subtitle {
+    font-size: 0.8rem;
+  }
+}

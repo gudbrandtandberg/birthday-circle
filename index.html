@@ -1,33 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Birthday Circle</title>
-    <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-    <div class="container">
-        <header>
-            <h1>Birthday Circle</h1>
-            <div class="controls">
-                <button id="zoomIn">+</button>
-                <button id="zoomOut">-</button>
-                <button id="resetView">Reset</button>
-                <button id="exportPdf">Export PDF</button>
-            </div>
-        </header>
-        
-        <div class="canvas-container">
-            <canvas id="birthdayCanvas"></canvas>
-        </div>
-        
-        <div class="info-panel">
-            <div id="tooltip" class="tooltip"></div>
-        </div>
-    </div>
-    
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="script.js"></script>
-</body>
-</html> 
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

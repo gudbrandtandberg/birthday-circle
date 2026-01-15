@@ -1,0 +1,106 @@
+.birthday-circle {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.birthday-circle-controls {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.birthday-circle-controls button {
+  background: #4299e1;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+  min-width: 50px;
+}
+
+.birthday-circle-controls button:hover {
+  background: #3182ce;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(66, 153, 225, 0.4);
+}
+
+.birthday-circle-controls button:active {
+  transform: translateY(0);
+}
+
+.birthday-circle-canvas-container {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  min-height: 0;
+}
+
+.birthday-circle-canvas {
+  display: block;
+  cursor: grab;
+  touch-action: none;
+  width: 100%;
+  height: 100%;
+}
+
+.birthday-circle-canvas:active {
+  cursor: grabbing;
+}
+
+/* Tooltip */
+.birthday-circle-tooltip {
+  position: absolute;
+  background: rgba(26, 32, 44, 0.95);
+  color: white;
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  max-width: 220px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transform: translate(-50%, -120%);
+  pointer-events: none;
+  backdrop-filter: blur(10px);
+  z-index: 100;
+}
+
+.birthday-circle-tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: rgba(26, 32, 44, 0.95);
+}
+
+.birthday-circle-tooltip-label {
+  margin-top: 8px;
+  color: #4ecdc4;
+  font-weight: 500;
+}
+
+.birthday-circle-tooltip-person {
+  margin-left: 8px;
+  color: #e2e8f0;
+}
+
+.birthday-circle-tooltip-year {
+  color: #a0aec0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .birthday-circle-controls button {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.9rem;
+  }
+}
