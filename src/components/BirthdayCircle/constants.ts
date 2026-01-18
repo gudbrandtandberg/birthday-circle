@@ -2,32 +2,32 @@ import type { BirthdayCircleTheme, BirthdayCircleConfig } from './types';
 
 export const DEFAULT_THEME: BirthdayCircleTheme = {
   // Circle
-  circleStrokeColor: 'rgba(255, 255, 255, 0.3)',
-  circleStrokeWidth: 2,
+  circleStrokeColor: 'rgba(255, 255, 255, 0.25)',
+  circleStrokeWidth: 1.5,
 
   // Day markers
-  regularDayColor: 'rgba(255, 255, 255, 0.4)',
-  regularDayHoverColor: 'rgba(255, 255, 255, 0.8)',
+  regularDayColor: 'rgba(255, 255, 255, 0.35)',
+  regularDayHoverColor: 'rgba(255, 255, 255, 0.7)',
   regularDaySize: 2,
   regularDayHoverSize: 4,
 
-  // Birthday markers
-  birthdayMarkerColor: '#4ecdc4',
-  birthdayMarkerHoverColor: '#ff6b6b',
-  birthdayMarkerSize: 7,
-  birthdayMarkerHoverSize: 10,
+  // Birthday markers - warm gold/amber
+  birthdayMarkerColor: '#f6ad55',
+  birthdayMarkerHoverColor: '#ed8936',
+  birthdayMarkerSize: 6,
+  birthdayMarkerHoverSize: 9,
 
   // Month labels
-  monthLabelColor: 'rgba(255, 255, 255, 0.8)',
-  monthLabelStrokeColor: 'rgba(0, 0, 0, 0.6)',
-  monthDividerColor: 'rgba(255, 255, 255, 0.6)',
+  monthLabelColor: 'rgba(255, 255, 255, 0.7)',
+  monthLabelStrokeColor: 'rgba(0, 0, 0, 0.4)',
+  monthDividerColor: 'rgba(255, 255, 255, 0.4)',
 
   // Birthday text
   birthdayTextColor: 'rgba(255, 255, 255, 0.9)',
-  birthdayTextStrokeColor: 'rgba(0, 0, 0, 0.7)',
+  birthdayTextStrokeColor: 'rgba(0, 0, 0, 0.5)',
 
   // Center
-  centerDotColor: 'rgba(255, 255, 255, 0.4)',
+  centerDotColor: 'rgba(255, 255, 255, 0.3)',
 };
 
 export const PRINT_THEME: BirthdayCircleTheme = {
@@ -62,9 +62,9 @@ export const PRINT_THEME: BirthdayCircleTheme = {
 
 export const DEFAULT_CONFIG: BirthdayCircleConfig = {
   // Zoom
-  minZoom: 0.1,
-  maxZoom: 10,
-  zoomStep: 1.2,
+  minZoom: 0.5,
+  maxZoom: 5,
+  zoomStep: 1.08,
 
   // Display
   daysInYear: 365,

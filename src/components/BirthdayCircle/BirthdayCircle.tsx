@@ -5,7 +5,14 @@ import { useCanvasSetup } from './hooks/useCanvasSetup';
 import { useTransform } from './hooks/useTransform';
 import { useInteractions } from './hooks/useInteractions';
 import { CircleRenderer } from './renderer/CircleRenderer';
-import { processBirthdays, screenToWorld, angleToDayOfYear, dayOfYearToDate } from './utils';
+import {
+  processBirthdays,
+  screenToWorld,
+  angleToDayOfYear,
+  dayOfYearToDate,
+  getTodaysBirthdays,
+  getUpcomingBirthdays,
+} from './utils';
 import './BirthdayCircle.css';
 
 export function BirthdayCircle({
@@ -32,22 +39,35 @@ export function BirthdayCircle({
   // Process birthdays into Map for efficient lookup
   const birthdayMap = useMemo(() => processBirthdays(birthdays), [birthdays]);
 
+  // Get today's birthdays and upcoming
+  const todaysBirthdays = useMemo(() => getTodaysBirthdays(birthdayMap), [birthdayMap]);
+  const upcomingBirthdays = useMemo(() => getUpcomingBirthdays(birthdayMap, 5), [birthdayMap]);
+
   // Canvas setup
   const dimensions = useCanvasSetup(canvasRef, config);
 
-  // Transform state (zoom, pan)
-  const { transform, zoom, zoomAt, pan, reset } = useTransform(dimensions, config);
+  // Transform state (zoom, rotation, pan)
+  const { transform, totalRotation, zoom, rotate, pan, reset } = useTransform(config);
 
-  // Check hover and show tooltip
+  // Check hover and show tooltip (accounting for rotation and pan)
   const handleHover = useCallback(
     (mouseX: number, mouseY: number) => {
       if (!dimensions) return;
 
       const { centerX, centerY, radius } = dimensions;
-      const { offsetX, offsetY, scale } = transform;
+      const { scale, offsetX, offsetY } = transform;
 
-      // Transform to world coordinates
-      const world = screenToWorld(mouseX, mouseY, centerX, centerY, offsetX, offsetY, scale);
+      // Transform to world coordinates (accounting for pan, rotation, scale)
+      const world = screenToWorld(
+        mouseX,
+        mouseY,
+        centerX,
+        centerY,
+        offsetX,
+        offsetY,
+        scale,
+        totalRotation
+      );
 
       // Calculate distance from center
       const distance = Math.sqrt(world.x * world.x + world.y * world.y);
@@ -62,7 +82,7 @@ export function BirthdayCircle({
         distance >= radius - config.dayHoverRadius && distance <= radius + config.dayHoverRadius;
 
       if (inTooltipZone && nearDayMarkers) {
-        // Calculate angle and day
+        // Calculate angle and day (in world coordinates, pre-rotation)
         const angle = Math.atan2(world.y, world.x);
         const dayOfYear = angleToDayOfYear(angle, config.daysInYear);
 
@@ -93,7 +113,7 @@ export function BirthdayCircle({
         onBirthdayHover?.(null, null);
       }
     },
-    [dimensions, transform, config, birthdayMap, onBirthdayHover]
+    [dimensions, transform, totalRotation, config, birthdayMap, onBirthdayHover]
   );
 
   const handleLeave = useCallback(() => {
@@ -107,9 +127,18 @@ export function BirthdayCircle({
       if (!dimensions || !onBirthdayClick) return;
 
       const { centerX, centerY, radius } = dimensions;
-      const { offsetX, offsetY, scale } = transform;
+      const { scale, offsetX, offsetY } = transform;
 
-      const world = screenToWorld(mouseX, mouseY, centerX, centerY, offsetX, offsetY, scale);
+      const world = screenToWorld(
+        mouseX,
+        mouseY,
+        centerX,
+        centerY,
+        offsetX,
+        offsetY,
+        scale,
+        totalRotation
+      );
       const distance = Math.sqrt(world.x * world.x + world.y * world.y);
 
       if (
@@ -125,13 +154,15 @@ export function BirthdayCircle({
         }
       }
     },
-    [dimensions, transform, config, birthdayMap, onBirthdayClick]
+    [dimensions, transform, totalRotation, config, birthdayMap, onBirthdayClick]
   );
 
   // Set up interactions
   useInteractions(canvasRef, {
+    dimensions,
+    onRotate: rotate,
     onPan: pan,
-    onZoomAt: zoomAt,
+    onZoom: zoom,
     onHover: handleHover,
     onLeave: handleLeave,
     onClick: onBirthdayClick ? handleClick : undefined,
@@ -148,7 +179,10 @@ export function BirthdayCircle({
     const renderer = new CircleRenderer(
       ctx,
       dimensions,
-      transform,
+      transform.scale,
+      totalRotation,
+      transform.offsetX,
+      transform.offsetY,
       theme,
       config,
       birthdayMap,
@@ -156,7 +190,7 @@ export function BirthdayCircle({
     );
 
     renderer.render();
-  }, [dimensions, transform, theme, config, birthdayMap, hoveredDay]);
+  }, [dimensions, transform, totalRotation, theme, config, birthdayMap, hoveredDay]);
 
   // Format tooltip content
   const formatTooltipContent = (state: TooltipState) => {
@@ -181,6 +215,10 @@ export function BirthdayCircle({
     );
   };
 
+  // Format today's date
+  const today = new Date();
+  const todayFormatted = `${MONTH_NAMES_FULL[today.getMonth()]} ${today.getDate()}`;
+
   return (
     <div className={`birthday-circle ${className || ''}`} style={style}>
       {showControls && (
@@ -197,8 +235,46 @@ export function BirthdayCircle({
         </div>
       )}
 
-      <div className="birthday-circle-canvas-container">
-        <canvas ref={canvasRef} className="birthday-circle-canvas" />
+      <div className="birthday-circle-main">
+        {/* Today's birthdays box */}
+        {todaysBirthdays.length > 0 && (
+          <div className="birthday-circle-today">
+            <div className="birthday-circle-today-header">🎂 Today - {todayFormatted}</div>
+            {todaysBirthdays.map((person, i) => (
+              <div key={i} className="birthday-circle-today-person">
+                {person.name}
+                <span className="birthday-circle-today-year">
+                  {' '}
+                  turns {today.getFullYear() - person.date.getFullYear()}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
+
+        <div className="birthday-circle-canvas-container">
+          <canvas ref={canvasRef} className="birthday-circle-canvas" />
+          {/* Today indicator at top */}
+          <div className="birthday-circle-today-marker">▼ Today</div>
+        </div>
+
+        {/* Upcoming birthdays list */}
+        <div className="birthday-circle-upcoming">
+          <div className="birthday-circle-upcoming-header">Upcoming</div>
+          {upcomingBirthdays.map((item, i) => {
+            const date = dayOfYearToDate(item.dayOfYear);
+            const monthDay = `${MONTH_NAMES_FULL[date.getMonth()].substring(0, 3)} ${date.getDate()}`;
+            return (
+              <div key={i} className="birthday-circle-upcoming-item">
+                <span className="birthday-circle-upcoming-name">{item.birthday.name}</span>
+                <span className="birthday-circle-upcoming-date">{monthDay}</span>
+                <span className="birthday-circle-upcoming-days">
+                  {item.daysUntil === 1 ? 'Tomorrow' : `${item.daysUntil} days`}
+                </span>
+              </div>
+            );
+          })}
+        </div>
       </div>
 
       {showTooltip && tooltipState && (

@@ -36,6 +36,15 @@
   transform: translateY(0);
 }
 
+/* Main layout with sidebars */
+.birthday-circle-main {
+  flex: 1;
+  display: flex;
+  gap: 1rem;
+  min-height: 0;
+  padding: 0 1rem;
+}
+
 .birthday-circle-canvas-container {
   flex: 1;
   position: relative;
@@ -53,6 +62,119 @@
 
 .birthday-circle-canvas:active {
   cursor: grabbing;
+}
+
+/* Today marker at top of circle */
+.birthday-circle-today-marker {
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+  pointer-events: none;
+}
+
+/* Today's birthdays box */
+.birthday-circle-today {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  background: rgba(78, 205, 196, 0.95);
+  color: white;
+  padding: 1rem;
+  border-radius: 12px;
+  min-width: 180px;
+  max-width: 220px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(10px);
+  z-index: 50;
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.birthday-circle-today-header {
+  font-weight: 600;
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.birthday-circle-today-person {
+  padding: 0.25rem 0;
+  font-size: 0.9rem;
+}
+
+.birthday-circle-today-year {
+  opacity: 0.8;
+  font-size: 0.85rem;
+}
+
+/* Upcoming birthdays list */
+.birthday-circle-upcoming {
+  width: 200px;
+  flex-shrink: 0;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 1rem;
+  backdrop-filter: blur(10px);
+  align-self: flex-start;
+  max-height: 100%;
+  overflow-y: auto;
+}
+
+.birthday-circle-upcoming-header {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.birthday-circle-upcoming-item {
+  display: flex;
+  flex-direction: column;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.birthday-circle-upcoming-item:last-child {
+  border-bottom: none;
+}
+
+.birthday-circle-upcoming-name {
+  color: white;
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.birthday-circle-upcoming-date {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.8rem;
+}
+
+.birthday-circle-upcoming-days {
+  color: #4ecdc4;
+  font-size: 0.75rem;
+  font-weight: 500;
 }
 
 /* Tooltip */
@@ -102,5 +224,38 @@
   .birthday-circle-controls button {
     padding: 0.4rem 0.8rem;
     font-size: 0.9rem;
+  }
+
+  .birthday-circle-main {
+    flex-direction: column;
+    padding: 0 0.5rem;
+  }
+
+  .birthday-circle-upcoming {
+    width: 100%;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .birthday-circle-upcoming-header {
+    width: 100%;
+  }
+
+  .birthday-circle-upcoming-item {
+    flex: 1;
+    min-width: 120px;
+    border-bottom: none;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 0.5rem;
+  }
+
+  .birthday-circle-today {
+    position: relative;
+    top: 0;
+    left: 0;
+    max-width: none;
+    margin-bottom: 0.5rem;
   }
 }

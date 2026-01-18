@@ -73,7 +73,7 @@ export function getCanvasCoordinates(
 }
 
 /**
- * Transform screen coordinates to world coordinates (accounting for pan and zoom)
+ * Transform screen coordinates to world coordinates (accounting for pan, rotation and zoom)
  */
 export function screenToWorld(
   screenX: number,
@@ -82,10 +82,67 @@ export function screenToWorld(
   centerY: number,
   offsetX: number,
   offsetY: number,
-  scale: number
+  scale: number,
+  rotation: number
 ): { x: number; y: number } {
+  // First, translate to center-relative coordinates (accounting for pan offset)
+  const relX = (screenX - centerX - offsetX) / scale;
+  const relY = (screenY - centerY - offsetY) / scale;
+
+  // Then, un-rotate to get world coordinates
+  const cos = Math.cos(-rotation);
+  const sin = Math.sin(-rotation);
+
   return {
-    x: (screenX - offsetX - centerX) / scale,
-    y: (screenY - offsetY - centerY) / scale,
+    x: relX * cos - relY * sin,
+    y: relX * sin + relY * cos,
   };
+}
+
+export interface UpcomingBirthday {
+  birthday: Birthday;
+  daysUntil: number;
+  dayOfYear: number;
+}
+
+/**
+ * Get birthdays happening today
+ */
+export function getTodaysBirthdays(birthdayMap: Map<number, Birthday[]>): Birthday[] {
+  const today = new Date();
+  const todayDayOfYear = getDayOfYear(today);
+  return birthdayMap.get(todayDayOfYear) || [];
+}
+
+/**
+ * Get upcoming birthdays sorted by days until
+ */
+export function getUpcomingBirthdays(
+  birthdayMap: Map<number, Birthday[]>,
+  count: number = 5
+): UpcomingBirthday[] {
+  const today = new Date();
+  const todayDayOfYear = getDayOfYear(today);
+  const daysInYear = 365; // Simplified
+
+  const upcoming: UpcomingBirthday[] = [];
+
+  // Iterate through all birthdays
+  birthdayMap.forEach((birthdays, dayOfYear) => {
+    // Skip today
+    if (dayOfYear === todayDayOfYear) return;
+
+    // Calculate days until this birthday
+    let daysUntil = dayOfYear - todayDayOfYear;
+    if (daysUntil < 0) {
+      daysUntil += daysInYear; // Wrap around to next year
+    }
+
+    for (const birthday of birthdays) {
+      upcoming.push({ birthday, daysUntil, dayOfYear });
+    }
+  });
+
+  // Sort by days until and take top N
+  return upcoming.sort((a, b) => a.daysUntil - b.daysUntil).slice(0, count);
 }

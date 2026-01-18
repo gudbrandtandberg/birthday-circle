@@ -88,7 +88,8 @@ export interface BirthdayCircleProps {
 // Internal state types
 export interface TransformState {
   scale: number;
-  offsetX: number;
+  rotation: number; // Manual rotation offset in radians
+  offsetX: number; // Pan offset
   offsetY: number;
 }
 

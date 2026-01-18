@@ -1,19 +1,25 @@
 import { useEffect, useRef, useCallback } from 'react';
 import type { RefObject } from 'react';
+import type { CanvasDimensions } from '../types';
 
 interface UseInteractionsOptions {
+  dimensions: CanvasDimensions | null;
+  onRotate: (deltaRadians: number) => void;
   onPan: (deltaX: number, deltaY: number) => void;
-  onZoomAt: (x: number, y: number, factor: number) => void;
+  onZoom: (factor: number) => void;
   onHover: (x: number, y: number) => void;
   onLeave: () => void;
   onClick?: (x: number, y: number) => void;
 }
 
+type DragMode = 'none' | 'rotate' | 'pan';
+
 export function useInteractions(
   canvasRef: RefObject<HTMLCanvasElement | null>,
   options: UseInteractionsOptions
 ) {
-  const isDraggingRef = useRef(false);
+  const dragModeRef = useRef<DragMode>('none');
+  const lastAngleRef = useRef(0);
   const lastPosRef = useRef({ x: 0, y: 0 });
 
   // Store options in ref to avoid stale closures
@@ -34,6 +40,36 @@ export function useInteractions(
     [canvasRef]
   );
 
+  // Calculate angle and distance from center
+  const getPositionFromCenter = useCallback(
+    (x: number, y: number): { angle: number; distance: number } | null => {
+      const dims = optionsRef.current.dimensions;
+      if (!dims) return null;
+
+      const dx = x - dims.centerX;
+      const dy = y - dims.centerY;
+      return {
+        angle: Math.atan2(dy, dx),
+        distance: Math.sqrt(dx * dx + dy * dy),
+      };
+    },
+    []
+  );
+
+  // Determine drag mode based on distance from circle edge
+  const getDragMode = useCallback((distance: number): DragMode => {
+    const dims = optionsRef.current.dimensions;
+    if (!dims) return 'pan';
+
+    const radius = dims.radius;
+    // If within 40px of the circle edge, rotate. Otherwise pan.
+    const edgeThreshold = 40;
+    if (Math.abs(distance - radius) < edgeThreshold) {
+      return 'rotate';
+    }
+    return 'pan';
+  }, []);
+
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -43,7 +79,11 @@ export function useInteractions(
       const coords = getCanvasCoords(e);
       if (!coords) return;
 
-      isDraggingRef.current = true;
+      const pos = getPositionFromCenter(coords.x, coords.y);
+      if (!pos) return;
+
+      dragModeRef.current = getDragMode(pos.distance);
+      lastAngleRef.current = pos.angle;
       lastPosRef.current = coords;
     };
 
@@ -51,7 +91,20 @@ export function useInteractions(
       const coords = getCanvasCoords(e);
       if (!coords) return;
 
-      if (isDraggingRef.current) {
+      if (dragModeRef.current === 'rotate') {
+        const pos = getPositionFromCenter(coords.x, coords.y);
+        if (!pos) return;
+
+        const deltaAngle = pos.angle - lastAngleRef.current;
+
+        // Handle wrap-around at ±π
+        let normalizedDelta = deltaAngle;
+        if (normalizedDelta > Math.PI) normalizedDelta -= 2 * Math.PI;
+        if (normalizedDelta < -Math.PI) normalizedDelta += 2 * Math.PI;
+
+        optionsRef.current.onRotate(normalizedDelta);
+        lastAngleRef.current = pos.angle;
+      } else if (dragModeRef.current === 'pan') {
         const deltaX = coords.x - lastPosRef.current.x;
         const deltaY = coords.y - lastPosRef.current.y;
         optionsRef.current.onPan(deltaX, deltaY);
@@ -62,21 +115,19 @@ export function useInteractions(
     };
 
     const handleMouseUp = () => {
-      isDraggingRef.current = false;
+      dragModeRef.current = 'none';
     };
 
     const handleMouseLeave = () => {
-      isDraggingRef.current = false;
+      dragModeRef.current = 'none';
       optionsRef.current.onLeave();
     };
 
     const handleWheel = (e: WheelEvent) => {
       e.preventDefault();
-      const coords = getCanvasCoords(e);
-      if (!coords) return;
-
-      const factor = e.deltaY > 0 ? 0.9 : 1.1;
-      optionsRef.current.onZoomAt(coords.x, coords.y, factor);
+      // Gentler zoom factor
+      const factor = e.deltaY > 0 ? 0.95 : 1.05;
+      optionsRef.current.onZoom(factor);
     };
 
     const handleClick = (e: MouseEvent) => {
@@ -95,27 +146,45 @@ export function useInteractions(
         const coords = getCanvasCoords(e.touches[0]);
         if (!coords) return;
 
-        isDraggingRef.current = true;
+        const pos = getPositionFromCenter(coords.x, coords.y);
+        if (!pos) return;
+
+        dragModeRef.current = getDragMode(pos.distance);
+        lastAngleRef.current = pos.angle;
         lastPosRef.current = coords;
       }
     };
 
     const handleTouchMove = (e: TouchEvent) => {
       e.preventDefault();
-      if (e.touches.length === 1 && isDraggingRef.current) {
+      if (e.touches.length === 1) {
         const coords = getCanvasCoords(e.touches[0]);
         if (!coords) return;
 
-        const deltaX = coords.x - lastPosRef.current.x;
-        const deltaY = coords.y - lastPosRef.current.y;
-        optionsRef.current.onPan(deltaX, deltaY);
-        lastPosRef.current = coords;
+        if (dragModeRef.current === 'rotate') {
+          const pos = getPositionFromCenter(coords.x, coords.y);
+          if (!pos) return;
+
+          const deltaAngle = pos.angle - lastAngleRef.current;
+
+          let normalizedDelta = deltaAngle;
+          if (normalizedDelta > Math.PI) normalizedDelta -= 2 * Math.PI;
+          if (normalizedDelta < -Math.PI) normalizedDelta += 2 * Math.PI;
+
+          optionsRef.current.onRotate(normalizedDelta);
+          lastAngleRef.current = pos.angle;
+        } else if (dragModeRef.current === 'pan') {
+          const deltaX = coords.x - lastPosRef.current.x;
+          const deltaY = coords.y - lastPosRef.current.y;
+          optionsRef.current.onPan(deltaX, deltaY);
+          lastPosRef.current = coords;
+        }
       }
     };
 
     const handleTouchEnd = (e: TouchEvent) => {
       e.preventDefault();
-      isDraggingRef.current = false;
+      dragModeRef.current = 'none';
     };
 
     // Attach listeners
@@ -143,5 +212,5 @@ export function useInteractions(
       canvas.removeEventListener('touchmove', handleTouchMove);
       canvas.removeEventListener('touchend', handleTouchEnd);
     };
-  }, [canvasRef, getCanvasCoords]);
+  }, [canvasRef, getCanvasCoords, getPositionFromCenter, getDragMode]);
 }
