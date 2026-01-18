@@ -1,50 +1,46 @@
-John Smith,1985-03-15
-Sarah Johnson,1990-07-22
-Michael Brown,1988-11-08
-Emma Davis,1992-05-12
-David Wilson,1987-09-30
-Lisa Anderson,1991-01-18
-Robert Taylor,1989-12-03
-Jennifer Miller,1993-06-25
-Christopher Garcia,1986-04-09
-Amanda Rodriguez,1994-10-14
-Matthew Martinez,1990-02-28
-Ashley Thompson,1988-08-17
-Joshua White,1992-12-21
-Nicole Harris,1987-05-06
-Andrew Clark,1991-09-11
-Stephanie Lewis,1989-03-02
-Ryan Walker,1993-07-19
-Michelle Hall,1985-11-26
-Kevin Young,1990-01-07
-Samantha King,1988-06-13
-Brandon Wright,1992-10-04
-Rachel Green,1987-04-21
-Justin Adams,1991-08-08
-Brittany Nelson,1989-12-15
-Tyler Baker,1993-03-29
-Danielle Hill,1986-07-05
-Zachary Campbell,1990-11-12
-Megan Parker,1988-02-14
-Jonathan Evans,1992-09-23
-Lauren Turner,1987-05-30
-Nathan Phillips,1991-01-25
-Kimberly Collins,1989-08-11
-Cameron Stewart,1993-12-07
-Alexis Morris,1985-04-18
-Trevor Reed,1990-10-01
-Crystal Cooper,1988-06-28
-Derek Richardson,1992-03-10
-Vanessa Cox,1987-09-16
-Sean Ward,1991-12-22
-Tiffany Torres,1989-05-03
-Marcus Peterson,1993-08-20
-Jasmine Gray,1986-02-11
-Victor Ramirez,1990-07-07
-Monique James,1988-11-24
-Adrian Watson,1992-04-15
-Gabrielle Brooks,1987-10-28
-Ethan Kelly,1991-06-09
-Natalie Sanders,1989-01-12
-Caleb Price,1993-09-05
-Destiny Bennett,1985-12-18 
+Tante Anne, 9-1-1957
+Chiara, 10-1-2024
+Tante Hilde, 16-1-1957
+Caroline, 17-1-1988
+Bestemamma, 19-1-1962
+Mathias, 4-2-1992
+Ivan, 5-2-1988
+Harald, 7-2-2024
+Ola, 12-2-2022
+Gudbrand, 13-2-1993
+Hedda, 5-5-2000
+Harald Ludvig, 8-5-1973
+Elmer, 23-5-2018
+Amanda, 24-5-2016
+Freya, 14-6-2023
+Julian, 18-6-2015
+Steven, 14-6-1987
+Walter Sr, 14-6-1955
+Xelva, 1-7-2023
+Rosalie, 5-7-2021
+Daniil, 24-7-2000
+Baba Alla, 31-7-1971
+Malthe, 31-7-1998
+Leonid, 3-8-2000
+Ida, 9-8-2019
+Frida, 18-8-2020
+Walter Jr, 2-9-1958
+Nina, 2-9-2018
+Margarita, 23-9-1993
+Marian, 23-9-1959
+Ksenia, 30-9-2000
+Eivind, 4-10-1992
+Nora, 7-10-1986
+Anna Ivanovna, 14-10-2000
+Edith, 16-10-2019
+Sergei, 20-10-2000
+Nikolai, 25-10-2022
+Tante Ingrid, 4-11-1955
+Bestepappa, 13-11-1958
+Sunniva, 21-11-1991
+Galina, 21-11-2000
+Magnus, 2-12-2006
+Camilla, 9-12-2020
+Adrian, 21-12-2020
+Evgenij, 29-12-2000
+
