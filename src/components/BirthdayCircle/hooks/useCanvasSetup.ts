@@ -26,11 +26,11 @@ export function useCanvasSetup(
       canvas.style.width = `${rect.width}px`;
       canvas.style.height = `${rect.height}px`;
 
-      // Calculate center and radius
+      // Calculate center and radius (clamp so radius is never negative or zero)
       const centerX = rect.width / 2;
       const centerY = rect.height / 2;
       const minDimension = Math.min(rect.width, rect.height);
-      const radius = Math.min(baseRadius, (minDimension - 100) / 2);
+      const radius = Math.max(10, Math.min(baseRadius, (minDimension - 100) / 2));
 
       setDimensions({
         width: rect.width,

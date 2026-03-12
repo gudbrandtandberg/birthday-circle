@@ -3,6 +3,14 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
+  "main": "src/components/BirthdayCircle/index.ts",
+  "types": "src/components/BirthdayCircle/index.ts",
+  "exports": {
+    ".": {
+      "import": "./src/components/BirthdayCircle/index.ts",
+      "types": "./src/components/BirthdayCircle/index.ts"
+    }
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
